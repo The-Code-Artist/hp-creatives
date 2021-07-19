@@ -12,7 +12,10 @@
       name="viewport"
     />
     <meta content="Marothi Mahlake" name="author" />
-    <meta content="HP Creatives is a creative agency based in the west rand. We offer bespoke graphic design services, videography services, events related graphic design, copywriting and digital marketing as well." name="description" />
+    <meta
+      content="HP Creatives is a creative agency based in the west rand. We offer bespoke graphic design services, videography services, events related graphic design, copywriting and digital marketing as well."
+      name="description"
+    />
     <link rel="stylesheet" href="font-awesome/css/all.min.css" />
     <!--<link rel="stylesheet" href="font-awesome/css/fontawesome.min.css" />
         <link rel="stylesheet" href="font-awesome/css/solid.min.css" />
@@ -31,7 +34,7 @@
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700"
     />
 
-    <script src="https://www.google.com/recaptcha/api.js?render=6LcwwKgbAAAAANlXqwDFWPGr_sKwRRb3YhCoXW8d"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LeBeN0ZAAAAAIpw4ooGeFNqB3gd58f_zLwqrKTR"></script>
 
     <style>
       @media (max-width: 376) {
@@ -276,12 +279,16 @@
                     <div class="form-group">
                       <div
                         id="loader"
-                        class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center "
+                        class="
+                          col-lg-12 col-md-12 col-sm-12 col-xs-12
+                          text-center
+                        "
                         style="
                           text-align: center;
                           display: none;
                           margin-bottom: 0.2em;
-                        "                      >
+                        "
+                      >
                         <img
                           alt="Loading"
                           src="img/loader/loading.gif"
@@ -335,13 +342,22 @@
         document
           .getElementById("contact-form")
           .addEventListener("submit", runVerification);
-        // Form data variables.
-        const nameField = document.querySelector("#name");
-        const emailField = document.querySelector("#email");
-        const enquiryField = document.getElementsByName("enquiry");
-        const messageField = document.querySelector("#message");
+        // Form fields.
+        const nameField = $("#name");
+        const emailField = $("#email");
+        const enquiryField = $("enquiry");
+        const messageField = $("#message");
 
+        // Validation error elements.
+        const nameError = $("#name-error");
+        const emailError = $("#email-error");
+        const messageError = $("#message-error");
+
+        // This variable will be used to obtain the value of the selected radio button.
         let selectedEnquiryValue;
+
+        // This boolean variable will be used to enforce the validity of the form.
+        let isValid = false;
 
         function runVerification(e) {
           e.preventDefault();
@@ -352,22 +368,29 @@
               selectedEnquiryValue = enquiryField[i].value;
             }
           }
-          $("#loader").fadeIn();
-          runCaptcha();
+          validateName();
+          validateEmail();
+          validateMessage();
+          
+          if (isValid) {
+            $("#loader").fadeIn();
+            runCaptcha();
+          }
+          
         }
 
         function runCaptcha() {
           grecaptcha
-            .execute("6LcwwKgbAAAAANlXqwDFWPGr_sKwRRb3YhCoXW8d", {
+            .execute("6LeBeN0ZAAAAAIpw4ooGeFNqB3gd58f_zLwqrKTR", {
               action: "",
             })
             .then(function (token) {
               const captcha = token;
               sendData(
-                nameField.value,
-                emailField.value,
+                nameField.val(),
+                emailField.val(),
                 selectedEnquiryValue,
-                messageField.value,
+                messageField.val(),
                 captcha
               );
             });
@@ -397,6 +420,70 @@
               $("#feedback").fadeIn();
               document.querySelector("#contact-form").reset();
             });
+        }
+
+        /** Validates the name. */
+        function validateName() {
+          try {
+            if (/.{2}/.test(nameField.val()) == false) {
+              throw "Please enter your name.";
+            } else if (/([\D])/.test(nameField.val()) == false) {
+              throw "A name must contain letters only.";
+            } else {
+              isValid = true;
+              nameError.text("");
+              nameError.hide();
+            }
+          } catch (msg) {
+            isValid = false;
+            nameError.text(msg);
+            nameField.focus();
+            nameField.select();
+            nameError.show();
+          }
+        }
+
+        /** Validates the email address. */
+        function validateEmail() {
+          var emailSyntax =
+            /^[_\w\-]+(\.[_\w\-]+)*@[\w\-]+(\.[\w\-]+)*(\.[\D]{2,6})$/;
+          try {
+            if (/.{7}/.test(emailField.val()) == false) {
+              throw "The email must contain 7 characters or more.";
+            } else if (emailSyntax.test(emailField.val()) == false) {
+              throw "Please enter a valid email address.";
+            } else {
+              isValid = true;
+              emailError.text("");
+              emailError.hide();
+            }
+          } catch (msg) {
+            isValid = false;
+            emailError.text(msg);
+            emailField.focus();
+            emailField.select();
+            emailError.show();
+          }
+        }
+
+        /** Validates the message field. */
+        function validateMessage() {
+          isValid = false;
+          try {
+            if (/.{20}/.test(messageField.val()) == false) {
+              throw "The message must at least contain 20 characters.";
+            } else {
+              isValid = true;
+              messageError.text("");
+              messageError.hide();
+            }
+          } catch (msg) {
+            isValid = false;
+            messageError.text(msg);
+            messageField.focus();
+            messageField.select();
+            messageError.show();
+          }
         }
       });
     </script>
